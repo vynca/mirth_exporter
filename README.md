@@ -1,15 +1,18 @@
 # Mirth Exporter
 
-Export Mirth Connect channel statistics to Prometheus.
+Export [Mirth Connect](https://en.wikipedia.org/wiki/Mirth_Connect) channel
+statistics to [Prometheus](https://prometheus.io).
+
+Metrics are retreived using the Mirth Connect CLI. This has only been tested
+with Mirth Connect 3.3.2, but it should work with any 3.x version.
 
 To run it:
-```bash
-go build
-./mirth_exporter [flags]
-```
+
+    go build
+    ./mirth_exporter [flags]
 
 ## Exported Metrics
-| Metric | Meaning | Labels |
+| Metric | Description | Labels |
 | ------ | ------- | ------ |
 | mirth_up | Was the last Mirth CLI query successful | |
 | mirth_channels_deployed | How many channels are deployed | |
@@ -21,9 +24,7 @@ go build
 | mirth_messages_errored | How many messages have errored | channel |
 
 ## Flags
-```bash
-./mirth_exporter --help
-```
+    ./mirth_exporter --help
 
 | Flag | Description | Default |
 | ---- | ----------- | ------- |
