@@ -17,11 +17,11 @@ To run it:
 | mirth_up | Was the last Mirth CLI query successful | |
 | mirth_channels_deployed | How many channels are deployed | |
 | mirth_channels_started | How many of the deployed channels are started | |
-| mirth_messages_received | How many messages have been received | channel |
-| mirth_messages_filtered | How many messages have been filtered | channel |
+| mirth_messages_received_total | How many messages have been received | channel |
+| mirth_messages_filtered_total  | How many messages have been filtered | channel |
 | mirth_messages_queued | How many messages are currently queued | channel |
-| mirth_messages_sent | How many messages have been sent | channel |
-| mirth_messages_errored | How many messages have errored | channel |
+| mirth_messages_sent_total  | How many messages have been sent | channel |
+| mirth_messages_errored_total  | How many messages have errored | channel |
 
 ## Flags
     ./mirth_exporter --help

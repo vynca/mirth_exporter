@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	_ "net/http/pprof"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -31,10 +32,10 @@ type Exporter struct {
 	messagesErrored     *prometheus.CounterVec
 }
 
-func NewExporter(mccliJarPath, mccliConfigPath *string) *Exporter {
+func NewExporter(mccliJarPath, mccliConfigPath string) *Exporter {
 	return &Exporter{
-		jarPath:    *mccliJarPath,
-		configPath: *mccliConfigPath,
+		jarPath:    mccliJarPath,
+		configPath: mccliConfigPath,
 		up: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "up",
@@ -53,7 +54,7 @@ func NewExporter(mccliJarPath, mccliConfigPath *string) *Exporter {
 		messagesReceived: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
-				Name:      "messages_received",
+				Name:      "messages_received_total",
 				Help:      "How many messages have been received (per channel).",
 			},
 			[]string{"channel"},
@@ -61,7 +62,7 @@ func NewExporter(mccliJarPath, mccliConfigPath *string) *Exporter {
 		messagesFiltered: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
-				Name:      "messages_filtered",
+				Name:      "messages_filtered_total",
 				Help:      "How many messages have been filtered (per channel).",
 			},
 			[]string{"channel"},
@@ -77,7 +78,7 @@ func NewExporter(mccliJarPath, mccliConfigPath *string) *Exporter {
 		messagesSent: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
-				Name:      "messages_sent",
+				Name:      "messages_sent_total",
 				Help:      "How many messages have been sent (per channel).",
 			},
 			[]string{"channel"},
@@ -85,7 +86,7 @@ func NewExporter(mccliJarPath, mccliConfigPath *string) *Exporter {
 		messagesErrored: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
-				Name:      "messages_errored",
+				Name:      "messages_errored_total",
 				Help:      "How many messages have errored (per channel).",
 			},
 			[]string{"channel"},
@@ -215,7 +216,7 @@ func main() {
 	)
 	flag.Parse()
 
-	exporter := NewExporter(mccliJarPath, mccliConfigPath)
+	exporter := NewExporter(*mccliJarPath, *mccliConfigPath)
 	prometheus.MustRegister(exporter)
 
 	log.Infof("Starting server: %s", *listenAddress)
