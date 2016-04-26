@@ -197,5 +197,14 @@ func main() {
 
 	log.Infof("Starting server: %s", *listenAddress)
 	http.Handle(*metricsPath, prometheus.Handler())
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`<html>
+             <head><title>Mirth Exporter</title></head>
+             <body>
+             <h1>Mirth Exporter</h1>
+             <p><a href='` + *metricsPath + `'>Metrics</a></p>
+             </body>
+             </html>`))
+	})
 	log.Fatal(http.ListenAndServe(*listenAddress, nil))
 }
