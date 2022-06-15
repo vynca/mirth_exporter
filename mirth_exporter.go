@@ -11,10 +11,20 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/log"
+	"github.com/prometheus/common/promlog"
 )
+
+type promHTTPLogger struct {
+	logger log.Logger
+}
+
+func (l promHTTPLogger) Println(v ...interface{}) {
+	level.Error(l.logger).Log("msg", fmt.Sprint(v...))
+}
 
 const namespace = "mirth"
 
@@ -62,13 +72,16 @@ var (
 )
 
 type Exporter struct {
-	jarPath, configPath string
+	jarPath string
+	configPath string
+	logger log.Logger
 }
 
-func NewExporter(mccliJarPath, mccliConfigPath string) *Exporter {
+func NewExporter(mccliJarPath string, mccliConfigPath string, logger log.Logger) *Exporter {
 	return &Exporter{
 		jarPath:    mccliJarPath,
 		configPath: mccliConfigPath,
+		logger: logger,
 	}
 }
 
@@ -89,7 +102,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(
 			up, prometheus.GaugeValue, 0,
 		)
-		log.Error(err)
+		level.Error(e.logger).Log(err)
 		return
 	}
 	ch <- prometheus.MustNewConstMetric(
@@ -126,7 +139,7 @@ func (e *Exporter) fetchStatLines() ([]string, error) {
 	if len(lines) < 3 {
 		return nil, fmt.Errorf("Unexpected output: %s", string(bytesOut))
 	}
-	log.Debug(string(bytesOut))
+	level.Debug(e.logger).Log(string(bytesOut))
 	return lines, nil
 }
 
@@ -193,10 +206,15 @@ func main() {
 	)
 	flag.Parse()
 
-	exporter := NewExporter(*mccliJarPath, *mccliConfigPath)
+	promlogConfig := &promlog.Config{}
+// 	flag.AddFlags(kingpin.CommandLine, promlogConfig)
+// 	kingpin.HelpFlag.Short('h')
+// 	kingpin.Parse()
+	logger := promlog.New(promlogConfig)
+	exporter := NewExporter(*mccliJarPath, *mccliConfigPath, logger)
 	prometheus.MustRegister(exporter)
 
-	log.Infof("Starting server: %s", *listenAddress)
+	level.Info(logger).Log("Starting server: %s", *listenAddress)
 	http.Handle(*metricsPath, promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
@@ -207,5 +225,5 @@ func main() {
              </body>
              </html>`))
 	})
-	log.Fatal(http.ListenAndServe(*listenAddress, nil))
+	level.Error(logger).Log(http.ListenAndServe(*listenAddress, nil))
 }
