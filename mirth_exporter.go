@@ -197,7 +197,7 @@ func main() {
 	var (
 		listenAddress = flag.String("web.listen-address", ":9140",
 			"Address to listen on for telemetry")
-		metricsPath = flag.String("web.telemetry-path", "/metrics",
+		metricsPath = flag.String("web.telemetry-path", "/internal/metrics",
 			"Path under which to expose metrics")
 		mccliConfigPath = flag.String("mccli.config-path", "./mirth-cli-config.properties",
 			"Path to properties file for Mirth Connect CLI")
@@ -207,9 +207,6 @@ func main() {
 	flag.Parse()
 
 	promlogConfig := &promlog.Config{}
-// 	flag.AddFlags(kingpin.CommandLine, promlogConfig)
-// 	kingpin.HelpFlag.Short('h')
-// 	kingpin.Parse()
 	logger := promlog.New(promlogConfig)
 	exporter := NewExporter(*mccliJarPath, *mccliConfigPath, logger)
 	prometheus.MustRegister(exporter)
