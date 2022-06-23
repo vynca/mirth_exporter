@@ -199,9 +199,9 @@ func main() {
 			"Address to listen on for telemetry")
 		metricsPath = flag.String("web.telemetry-path", "/internal/metrics",
 			"Path under which to expose metrics")
-		mccliConfigPath = flag.String("mccli.config-path", "./mirth-cli-config.properties",
+		mccliConfigPath = flag.String("mccli.config-path", "./../opt/connect/conf/mirth-cli-config.properties",
 			"Path to properties file for Mirth Connect CLI")
-		mccliJarPath = flag.String("mccli.jar-path", "./mirth-cli-launcher.jar",
+		mccliJarPath = flag.String("mccli.jar-path", "./../opt/connect/mirth-cli-launcher.jar",
 			"Path to jar file for Mirth Connect CLI")
 	)
 	flag.Parse()
