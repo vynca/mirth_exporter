@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-  "github.com/joho/godotenv"
 )
 
 func goDotEnvVariable(key string) string {
@@ -23,6 +22,7 @@ func goDotEnvVariable(key string) string {
 //     }
 // }
  func load_properties() {
+// todo fix ?? if then , add to main package
    godotenv.Load(".env")
    defaultMirthServiceUrl := "https://localhost:8443"
    mirthServiceURL := goDotEnvVariable("MIRTH_SERVICE_URL") ?? defaultMirthServiceUrl
