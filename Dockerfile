@@ -14,7 +14,7 @@ RUN curl -SL 'https://s3.amazonaws.com/downloads.mirthcorp.com/connect/3.11.0.b2
     && mv "/opt/Mirth Connect" /opt/connect
 
 # TODO keep cli-lib folder, config/mirth_cli_config.properties , & mirth_cli_launcher.jar, everything else can be removed
-
+RUN go run update_properties.go
 RUN go build -o /mirth_exporter
 
 EXPOSE 9041

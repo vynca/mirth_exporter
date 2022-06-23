@@ -194,6 +194,7 @@ func (e *Exporter) readChannelStats(lines []string, ch chan<- prometheus.Metric)
 }
 
 func main() {
+
 	var (
 		listenAddress = flag.String("web.listen-address", ":9041",
 			"Address to listen on for telemetry")
