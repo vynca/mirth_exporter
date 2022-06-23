@@ -195,7 +195,7 @@ func (e *Exporter) readChannelStats(lines []string, ch chan<- prometheus.Metric)
 
 func main() {
 	var (
-		listenAddress = flag.String("web.listen-address", ":9140",
+		listenAddress = flag.String("web.listen-address", ":9041",
 			"Address to listen on for telemetry")
 		metricsPath = flag.String("web.telemetry-path", "/internal/metrics",
 			"Path under which to expose metrics")
