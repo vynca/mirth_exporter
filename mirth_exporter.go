@@ -10,12 +10,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"os"
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
+  "github.com/joho/godotenv"
 )
 
 type promHTTPLogger struct {
@@ -24,6 +26,42 @@ type promHTTPLogger struct {
 
 func (l promHTTPLogger) Println(v ...interface{}) {
 	level.Error(l.logger).Log("msg", fmt.Sprint(v...))
+}
+
+func goDotEnvVariable(key string, defaultValue string, logger log.Logger) string {
+   val, ok := os.LookupEnv(key)
+   if !ok {
+      val = defaultValue
+   }
+   return val
+ }
+
+ func load_properties(logger log.Logger) {
+   err := godotenv.Load(".env")
+
+   if err != nil {
+      level.Error(logger).Log("Error loading .env file: %s", err)
+   }
+
+   properties_file_name :=  "mirth-cli-config.properties"
+   defaultMirthServiceUrl := "https://localhost:8443"
+   defaultMirthUsernamePassword := "admin"
+
+   mirthServiceURL := goDotEnvVariable("MIRTH_SERVICE_URL", defaultMirthServiceUrl, logger)
+   mirthUsername := goDotEnvVariable("USERNAME", defaultMirthUsernamePassword, logger)
+   mirthPassword := goDotEnvVariable("PASSWORD",  defaultMirthUsernamePassword, logger)
+   mirthVersion := "3.11.0"
+
+   file, err := os.Create(properties_file_name)
+    if err != nil {
+             level.Error(logger).Log("load_properties: %s", err)
+   }
+
+  file.WriteString(fmt.Sprintf("address=%s\n",mirthServiceURL))
+  file.WriteString(fmt.Sprintf("user=%s\n",mirthUsername))
+  file.WriteString(fmt.Sprintf("password=%s\n",mirthPassword))
+  file.WriteString(fmt.Sprintf("version=%s\n",mirthVersion))
+  file.Close()
 }
 
 const namespace = "mirth"
@@ -194,7 +232,6 @@ func (e *Exporter) readChannelStats(lines []string, ch chan<- prometheus.Metric)
 }
 
 func main() {
-
 	var (
 		listenAddress = flag.String("web.listen-address", ":9041",
 			"Address to listen on for telemetry")
@@ -209,6 +246,7 @@ func main() {
 
 	promlogConfig := &promlog.Config{}
 	logger := promlog.New(promlogConfig)
+	load_properties(logger)
 	exporter := NewExporter(*mccliJarPath, *mccliConfigPath, logger)
 	prometheus.MustRegister(exporter)
 
